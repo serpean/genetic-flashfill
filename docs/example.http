@@ -1,0 +1,13 @@
+###
+POST localhost:5000/process
+Content-Type: application/json
+
+{
+  "examples": [
+      ["hola mundo", "hola"],
+      ["Uncle Bob", "Uncle"]],
+  "questions": [
+       "Alice Bob", "Robert Martin", "Kent Beck"
+  ]
+}
+
