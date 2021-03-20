@@ -3,15 +3,13 @@ from difflib import SequenceMatcher
 from math import log
 from random import random, randint, choice
 
-
-class fwrapper:
+class Fwrapper:
     def __init__(self, function, params, name):
         self.function = function
         self.params = params
         self.name = name
 
-
-class node:
+class Node:
     def __init__(self, fw, children):
         self.function = fw.function
         self.name = fw.name
@@ -27,7 +25,7 @@ class node:
             c.display(indent + 1)
 
 
-class paramnode:
+class ParamNode:
     def __init__(self, idx):
         self.idx = idx
 
@@ -38,7 +36,7 @@ class paramnode:
         print('%sp%d' % (' ' * indent, self.idx))
 
 
-class constnode:
+class ConstNode:
     def __init__(self, v):
         self.v = v
 
@@ -49,48 +47,15 @@ class constnode:
         print('%s%s' % (' ' * indent, self.v))
 
 
-addw = fwrapper(lambda l: l[0] + l[1], ['int', 'int'], 'add')
-subw = fwrapper(lambda l: l[0] - l[1], ['int', 'int'], 'subtract')
-mulw = fwrapper(lambda l: l[0] * l[1], ['int', 'int'], 'multiply')
+addw = Fwrapper(lambda l: l[0] + l[1], ['int', 'int'], 'add')
+subw = Fwrapper(lambda l: l[0] - l[1], ['int', 'int'], 'subtract')
+mulw = Fwrapper(lambda l: l[0] * l[1], ['int', 'int'], 'multiply')
+ifw = Fwrapper(lambda l: l[1] if l[0] > 0 else l[2], ['int', 'int', 'int'], 'if')
+gtw = Fwrapper(lambda l: 1 if l[0] > l[1] else 0, ['int', 'int'], 'isgreater')
+substringw = Fwrapper(lambda l: l[0][l[1]: l[2]], ["str", "int", "int"], 'substring')
+concatw = Fwrapper(lambda l: l[0] + l[1], ["str", "str"], 'concat')
+indexw = Fwrapper(lambda l: l[0].index(l[1]), ["str", "str"], 'index') # FIXME: String cannot contains substring. In this case, max ratio will be use
 
-
-def iffunc(l):
-    if l[0] > 0:
-        return l[1]
-    else:
-        return l[2]
-
-
-ifw = fwrapper(iffunc, ['int', 'int', 'int'], 'if')
-
-
-def isgreater(l):
-    if l[0] > l[1]:
-        return 1
-    else:
-        return 0
-
-
-gtw = fwrapper(isgreater, ['int', 'int'], 'isgreater')
-
-
-def substring(l):
-    return l[0][l[1]: l[2]]
-
-substringw = fwrapper(substring, ["str", "int", "int"], 'substring')
-
-def concat(l):
-    return l[0] + l[1]
-
-concatw = fwrapper(concat, ["str", "str"], 'concat')
-
-def index(l):
-    # FIXME: String cannot contains substring. In this case, max ratio will be use
-    return l[0].index(l[1])
-
-indexw = fwrapper(index, ["str", "str"], 'index')
-
-# flist = [addw, mulw, ifw, gtw, subw]
 flist = {'str': [substringw, concatw, indexw], 'int': [addw, subw]}
 
 
@@ -99,16 +64,16 @@ def makerandomtree(pc, datatype, maxdepth=4, fpr=0.5, ppr=0.5):
         f = choice(flist[datatype])
         # Call makerandomtree with all the parameter types for f
         children = [makerandomtree(pc, type, maxdepth - 1, fpr, ppr) for type in f.params]
-        return node(f, children)
+        return Node(f, children)
     elif random() < ppr and datatype == 'str':
-        return paramnode(randint(0, pc - 1))
+        return ParamNode(randint(0, pc - 1))
     else:
         # return 1 to 10 if integer
         # else return common char
         if datatype == 'str':
-            return constnode(choice([" ", ".", "-"]))
+            return ConstNode(choice([" ", ".", "-"]))
         else:
-            return constnode(randint(0, 10))
+            return ConstNode(randint(0, 10))
 
 
 def mutate(t, pc, datatype, probchange=0.1):
@@ -130,20 +95,6 @@ def crossover(t1, t2, probswap=0.7, top=1):
             result.params = [crossover(c, choice(t2.children), probswap, 0)
                              for c in t1.children if hasattr(t1, 'funtion') and hasattr(t2, 'funtion') and t1.funtion.params == t2.funtion.params]
         return result
-
-
-def hiddenfunction(x):
-    return x[0: x.index(" ") - 1]
-
-
-def buildhiddenset():
-    rows = [["hola mundo", "hola"],
-            ["Sergio Pérez", "Sergio"]]
-
-    #rows = [["20-12", "12"],
-    #        ["12-1", "1"]]
-    return rows
-
 
 
 def scorefunction(tree, s):
@@ -198,9 +149,5 @@ def evolve(pc,datatype, popsize, rankfunction, maxgen=500,
                 newpop.append(makerandomtree(pc, datatype))
 
         population = newpop
-    print("winner", scores[0][1].display())
+    #print("winner", scores[0][1].display())
     return scores[0][1]
-
-if __name__ == '__main__':
-    rf = getrankfunction(buildhiddenset())
-    evolve(1, 'str', 500, rf, mutationrate=0.2, breedingrate=0.1, pexp=0.7, pnew=0.1)
