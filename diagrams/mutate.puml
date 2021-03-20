@@ -1,0 +1,69 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+partition Original {
+    : if ]
+    split
+        : > ]
+        split
+            : X ]
+            kill
+        split again
+            : 3 ]
+            kill
+        end split
+    split again
+        : + ]
+        split
+            : Y ]
+            kill
+        split again
+            : 5 ]
+            kill
+        end split
+    split again
+        : - ]
+        split
+            : Y ]
+            kill
+        split again
+            : 2 ]
+            kill
+        end split
+    end split
+}
+
+partition Mutated {
+    : if ]
+    split
+        : > ]
+        split
+            : X ]
+            kill
+        split again
+            : 3 ]
+            kill
+        end split
+    split again
+        : + ]
+        split
+            : Y ]
+            kill
+        split again
+            : 5 ]
+            kill
+        end split
+    split again
+        partition Replaced {
+            : * ]
+            split
+                : Y ]
+                kill
+            split again
+                : 2 ]
+                kill
+            end split
+        }
+    end split
+}
+@enduml

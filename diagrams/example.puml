@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+
+: substring ]
+note right : substring(x, 0, index(x, " "))
+split
+    : p0 ]
+    kill
+split again
+    : 0 ]
+    kill
+split again
+    : index ]
+    split
+        : p0 ]
+        kill
+    split again
+        : " " ]
+        kill
+    end split
+end split
+
+@enduml

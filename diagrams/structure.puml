@@ -1,0 +1,9 @@
+@startuml
+'https://plantuml.com/state-diagram
+
+class Fwrapper
+class Node
+class ParamNode
+class ConstNode
+
+@enduml
