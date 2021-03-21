@@ -6,7 +6,13 @@ This repository is used as ML backend to create Google  Spreadsheets Addon.
 
 ## Install
 
-conda create --name genetic-flashfill --file requirements.txt
+```shell
+pip3 install virtualenv
+python3 -m venv genetic-flashfill
+source venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
 
 ## Resources
 

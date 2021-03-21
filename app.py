@@ -9,7 +9,7 @@ swagger = Swagger(app)
 
 @app.route('/process', methods=['POST'])
 def process():
-    """Process enpoint doc
+    """Process endpoint doc
        ---
        definitions:
          Example:
