@@ -1,4 +1,4 @@
-from logging.config import  dictConfig
+from logging.config import dictConfig
 from flask import Flask, jsonify, abort, request
 from flasgger import Swagger
 
@@ -8,6 +8,7 @@ from settings import LOG_CONFIG
 app = Flask(__name__)
 swagger = Swagger(app)
 dictConfig(LOG_CONFIG)
+
 
 @app.route('/process', methods=['POST'])
 def process():
@@ -52,4 +53,4 @@ def process():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
