@@ -1,7 +1,10 @@
+import logging
 from copy import deepcopy
 from difflib import SequenceMatcher
 from math import log
 from random import random, randint, choice
+
+logger = logging.getLogger(__name__)
 
 class Fwrapper:
     def __init__(self, function, params, name):
@@ -20,7 +23,7 @@ class Node:
         return self.function(results)
 
     def display(self, indent=0):
-        print((' ' * indent) + self.name)
+        logger.info((' ' * indent) + self.name)
         for c in self.children:
             c.display(indent + 1)
 
@@ -33,7 +36,7 @@ class ParamNode:
         return inp[self.idx]
 
     def display(self, indent=0):
-        print('%sp%d' % (' ' * indent, self.idx))
+        logger.info('%sp%d' % (' ' * indent, self.idx))
 
 
 class ConstNode:
@@ -44,7 +47,7 @@ class ConstNode:
         return self.v
 
     def display(self, indent=0):
-        print('%s%s' % (' ' * indent, self.v))
+        logger.info('%s%s' % (' ' * indent, self.v))
 
 
 addw = Fwrapper(lambda l: l[0] + l[1], ['int', 'int'], 'add')
@@ -113,7 +116,7 @@ def getrankfunction(dataset):
         scores = [(scorefunction(t, dataset), t) for t in population]
         # scores.sort()
         scores.sort(key=lambda tup: tup[0])
-        # print (scores)
+        # logger.debug(scores)
         return scores
 
     return rankfunction
@@ -130,7 +133,8 @@ def evolve(pc,datatype, popsize, rankfunction, maxgen=500,
     population = [makerandomtree(pc,datatype) for i in range(popsize)]
     for i in range(maxgen):
         scores = rankfunction(population)
-        print(scores[0][0])
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(scores[0][0])
         if scores[0][0] == 0: break
 
         # The two best always make it
@@ -149,5 +153,6 @@ def evolve(pc,datatype, popsize, rankfunction, maxgen=500,
                 newpop.append(makerandomtree(pc, datatype))
 
         population = newpop
-    #print("winner", scores[0][1].display())
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("winner", scores[0][1].display())
     return scores[0][1]

@@ -1,11 +1,13 @@
-from flask import Flask, jsonify, abort, request, render_template
-
+from logging.config import  dictConfig
+from flask import Flask, jsonify, abort, request
 from flasgger import Swagger
 
 from geneticlib import getrankfunction, evolve
+from settings import LOG_CONFIG
 
 app = Flask(__name__)
 swagger = Swagger(app)
+dictConfig(LOG_CONFIG)
 
 @app.route('/process', methods=['POST'])
 def process():
@@ -40,7 +42,7 @@ def process():
        """
     if request.method == 'POST':
         content = request.json
-        print(content)
+        app.logger.info(content)
         if content:
             rf = getrankfunction(content["examples"])
             winner = evolve(1, 'str', 500, rf, mutationrate=0.2, breedingrate=0.1, pexp=0.7, pnew=0.1)
