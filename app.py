@@ -1,5 +1,5 @@
 from logging.config import dictConfig
-from flask import Flask, jsonify, abort, request
+from flask import Flask, jsonify, abort, request, redirect
 from flasgger import Swagger
 
 from geneticlib import getrankfunction, evolve
@@ -51,6 +51,9 @@ def process():
         else:
             abort(400, description="'content' is expected")
 
+@app.route('/')
+def index():
+    return redirect('apidocs')
 
 if __name__ == '__main__':
     app.run()
