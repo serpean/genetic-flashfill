@@ -1,0 +1,69 @@
+### Local test
+#### Process
+POST localhost:5000/process
+Content-Type: application/json
+
+{
+  "train": [
+      ["hola mundo", "hola"],
+      ["Uncle Bob", "Uncle"]],
+  "test": [
+       "Alice Bob", "Robert Martin", "Kent Beck"
+  ]
+}
+#### Function Generate
+POST localhost:5000/function/generate
+Content-Type: application/json
+
+{
+  "train": [
+      ["hola mundo", "hola"],
+      ["Uncle Bob", "Uncle"]]
+}
+#### Function Proccess
+POST localhost:5000/function/proccess
+Content-Type: application/json
+
+{
+  "test": [
+       "Alice Bob", "Robert Martin", "Kent Beck"
+  ],
+   "function": {
+    "substring": [
+      "p0",
+      {
+        "index": [
+          " ",
+          {
+            "substring": [
+              "p0",
+              {
+                "add": [
+                  10,
+                  {
+                    "subtract": [
+                      7,
+                      6
+                    ]
+                  }
+                ]
+              },
+              {
+                "add": [
+                  5,
+                  6
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "index": [
+          "p0",
+          " "
+        ]
+      }
+    ]
+  }
+}

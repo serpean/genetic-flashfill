@@ -1,0 +1,23 @@
+### Heroku test
+#### Process
+POST https://ers-addon.herokuapp.com/process
+Content-Type: application/json
+
+{
+  "train": [
+      ["hola mundo", "hola"],
+      ["Uncle Bob", "Uncle"]],
+  "test": [
+       "Alice Bob", "Robert Martin", "Kent Beck"
+  ]
+}
+
+#### Function
+POST https://ers-addon.herokuapp.com/function
+Content-Type: application/json
+
+{
+  "train": [
+      ["hola mundo", "hola"],
+      ["Uncle Bob", "Uncle"]]
+}

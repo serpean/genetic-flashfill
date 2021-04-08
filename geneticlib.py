@@ -27,6 +27,9 @@ class Node:
         for c in self.children:
             c.display(indent + 1)
 
+    def toDict(self):
+        return {self.name: [c.toDict() for c in self.children]}
+
 
 class ParamNode:
     def __init__(self, idx):
@@ -37,6 +40,9 @@ class ParamNode:
 
     def display(self, indent=0):
         logger.info('%sp%d' % (' ' * indent, self.idx))
+
+    def toDict(self):
+        return 'p%d' % self.idx
 
 
 class ConstNode:
@@ -49,6 +55,9 @@ class ConstNode:
     def display(self, indent=0):
         logger.info('%s%s' % (' ' * indent, self.v))
 
+    def toDict(self):
+        return self.v
+
 
 addw = Fwrapper(lambda l: l[0] + l[1], ['int', 'int'], 'add')
 subw = Fwrapper(lambda l: l[0] - l[1], ['int', 'int'], 'subtract')
@@ -60,6 +69,27 @@ concatw = Fwrapper(lambda l: l[0] + l[1], ["str", "str"], 'concat')
 indexw = Fwrapper(lambda l: l[0].index(l[1]), ["str", "str"], 'index') # FIXME: String cannot contains substring. In this case, max ratio will be use
 
 flist = {'str': [substringw, concatw, indexw], 'int': [addw, subw]}
+
+reverse_fList = {
+    'add': addw,
+    'subtract': subw,
+    'multiply': mulw,
+    'if': ifw,
+    'isgreater': gtw,
+    'substring': substringw,
+    'concat': concatw,
+    'index': indexw
+}
+
+
+def recreate_function(input_value):
+    if isinstance(input_value, dict):
+        for k in input_value.keys():
+            return Node(reverse_fList[k], [recreate_function(v) for v in input_value[k]])
+    elif isinstance(input_value, str) and 'p' in input_value:
+        return ParamNode(int(input_value[input_value.index('p') + 1:]))
+    else:
+        return ConstNode(input_value)
 
 
 def makerandomtree(pc, datatype, maxdepth=4, fpr=0.5, ppr=0.5):
