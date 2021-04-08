@@ -15,29 +15,31 @@ def process():
     """Process endpoint doc
        ---
        definitions:
-         Example:
+         Train:
            type: array
            items:
-            string
-         Question:
+            type: string
+           example: [["José Pérez", "José"],["Uncle Bob", "Uncle"]]
+         Test:
            type: string
+           example: ["Alice Bob", "Robert Martin", "Kent Beck"]
        parameters:
          - name: body
            in: body
            type: Object
            properties:
-            examples:
+            train:
                 type: array
                 items:
-                    $ref: "#/definitions/Example"
-            questions:
+                    $ref: "#/definitions/Train"
+            test:
                 type: array
                 items:
-                    $ref: "#/definitions/Question"
+                    $ref: "#/definitions/Test"
            required: true
        responses:
          200:
-           description: Answer to Questions' array
+           description: Answer to Test' array
            examples:
              answer: ['string']
        """
@@ -45,9 +47,9 @@ def process():
         content = request.json
         app.logger.info(content)
         if content:
-            rf = getrankfunction(content["examples"])
+            rf = getrankfunction(content["train"])
             winner = evolve(1, 'str', 500, rf, mutationrate=0.2, breedingrate=0.1, pexp=0.7, pnew=0.1)
-            return jsonify({"answer": [winner.evaluate([i]) for i in content["questions"]]})
+            return jsonify({"answer": [winner.evaluate([i]) for i in content["test"]]})
         else:
             abort(400, description="'content' is expected")
 
