@@ -1,0 +1,25 @@
+Process endpoint doc
+---
+parameters:
+  - name: body
+    in: body
+    type: Object
+    properties:
+      train:
+        $ref: "#/definitions/Train"
+      test:
+        $ref: "#/definitions/Test"
+definitions:
+  Train:
+    type: array
+    example: [[ "José Pérez", "José"], [ "Uncle Bob", "Uncle" ]]
+  Test:
+    type: array
+    items:
+      type: string
+    example: ["Alice Bob", "Robert Martin", "Kent Beck"]
+responses:
+  200:
+    description: Answer to Test' array
+    examples:
+      answer: [ 'string' ]

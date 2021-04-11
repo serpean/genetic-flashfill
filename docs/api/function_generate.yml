@@ -1,0 +1,20 @@
+Get function endpoint doc
+---
+parameters:
+  - name: body
+    in: body
+    type: Object
+    properties:
+      train:
+        $ref: "#/definitions/Train"
+definitions:
+  Train:
+    type: array
+    example: [[ "José Pérez", "José" ],[ "Uncle Bob", "Uncle" ]]
+  Function:
+    type: Object
+responses:
+  200:
+    description: Function generated with Train array
+    examples:
+      function: [ 'string' ]

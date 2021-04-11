@@ -1,48 +1,20 @@
 from logging.config import dictConfig
 from flask import Flask, jsonify, abort, request, redirect
-from flasgger import Swagger
-
+from flasgger import Swagger, swag_from
 from geneticlib import getrankfunction, evolve, recreate_function
 from settings import LOG_CONFIG
 
 app = Flask(__name__)
-swagger = Swagger(app)
+Swagger(app)
 dictConfig(LOG_CONFIG)
 
 
 @app.route('/process', methods=['POST'])
+@swag_from('docs/api/process.yml')
 def process():
-    """Process endpoint doc
-       ---
-       definitions:
-         Train:
-           type: array
-           items:
-            type: string
-           example: [["José Pérez", "José"],["Uncle Bob", "Uncle"]]
-         Test:
-           type: string
-           example: ["Alice Bob", "Robert Martin", "Kent Beck"]
-       parameters:
-         - name: body
-           in: body
-           type: Object
-           properties:
-            train:
-                type: array
-                items:
-                    $ref: "#/definitions/Train"
-            test:
-                type: array
-                items:
-                    $ref: "#/definitions/Test"
-           required: true
-       responses:
-         200:
-           description: Answer to Test' array
-           examples:
-             answer: ['string']
-       """
+    """
+    Process endpoint doc
+    """
     if request.method == 'POST':
         content = request.json
         app.logger.info(content)
@@ -55,36 +27,11 @@ def process():
 
 
 @app.route('/function/generate', methods=['POST'])
-def function():
-    """Get function endpoint doc
-       ---
-       definitions:
-         Train:
-           type: array
-           items:
-            type: string
-           example: [["José Pérez", "José"],["Uncle Bob", "Uncle"]]
-         Function:
-           type: Object
-           items:
-            type: string
-           example: [["José Pérez", "José"],["Uncle Bob", "Uncle"]]
-       parameters:
-         - name: body
-           in: body
-           type: Object
-           properties:
-            train:
-                type: array
-                items:
-                    $ref: "#/definitions/Train"
-           required: true
-       responses:
-         200:
-           description: Function generated with Train array
-           examples:
-             function: ['string']
-       """
+@swag_from('docs/api/function_generate.yml')
+def function_generate():
+    """
+    Get function endpoint doc
+    """
     if request.method == 'POST':
         content = request.json
         app.logger.info(content)
@@ -95,48 +42,13 @@ def function():
         else:
             abort(400, description="'content' is expected")
 
-@app.route('/function/proccess', methods=['POST'])
-def processFunction():
-    """Proccess a previous generated function
-       ---
-       definitions:
-         Function:
-           type: Object
-           items:
-            type: string
-           example: {
-                  "substring": [
-                    0,
-                    0,
-                    {
-                      "index": [
-                        0,
-                        " "
-                      ]
-                    }
-                  ]
-            }
-         Test:
-           type: string
-           example: ["Alice Bob", "Robert Martin", "Kent Beck"]
-       parameters:
-         - name: body
-           in: body
-           type: Object
-           properties:
-            train:
-                type: array
-                items:
-                    $ref: "#/definitions/Train"
-            function:
-                $ref: "#/definitions/Function"
-           required: true
-       responses:
-         200:
-           description: Function generated with Train array
-           examples:
-             function: ['string']
-       """
+
+@app.route('/function/process', methods=['POST'])
+@swag_from('docs/api/function_process.yml')
+def function_process():
+    """
+    Process a previous generated function
+    """
     if request.method == 'POST':
         content = request.json
         app.logger.info(content)
@@ -146,9 +58,11 @@ def processFunction():
         else:
             abort(400, description="'content' is expected")
 
+
 @app.route('/')
 def index():
     return redirect('apidocs')
+
 
 if __name__ == '__main__':
     app.run()

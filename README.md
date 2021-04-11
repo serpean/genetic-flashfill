@@ -22,6 +22,12 @@ LOG_FILE_NAME_PREFIX = f"console-{datetime.today().strftime('%Y%m%d')}"
 
 ## Heroku deploy
 
+> TBD
+
+## Test server
+
+* [Server](https://ers-addon.herokuapp.com/apidocs/)
+
 ## Resources
 
 * Chapter 11: [Programming Collective Intelligence](https://www.oreilly.com/library/view/programming-collective-intelligence/9780596529321/)

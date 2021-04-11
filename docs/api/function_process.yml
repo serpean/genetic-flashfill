@@ -1,0 +1,36 @@
+Process a previous generated function
+---
+parameters:
+  - name: body
+    in: body
+    type: Object
+    properties:
+      test:
+        $ref: "#/definitions/Test"
+      function:
+        $ref: "#/definitions/Function"
+definitions:
+  Function:
+    type: Object
+    items:
+      type: string
+    example: {
+      "substring": [
+          "p0",
+          0,
+        {
+          "index": [
+              "p0",
+              " "
+          ]
+        }
+      ]
+    }
+  Test:
+    type: string
+    example: [ "Alice Bob", "Robert Martin", "Kent Beck" ]
+responses:
+  200:
+    description: Function generated with Train array
+    examples:
+      function: [ 'string' ]
