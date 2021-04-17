@@ -1,6 +1,6 @@
 import unittest
 
-from geneticlib import getrankfunction, evolve
+from geneticlib import get_rank_function, evolve
 
 
 def buildhiddenset():
@@ -15,8 +15,8 @@ def buildhiddenset():
 class TestEvolve(unittest.TestCase):
 
     def test_evolve(self):
-        rf = getrankfunction(buildhiddenset())
-        winner = evolve(1, 'str', 500, rf, mutationrate=0.2, breedingrate=0.1, pexp=0.7, pnew=0.1)
+        rf = get_rank_function(buildhiddenset())
+        winner = evolve(1, 'str', 500, rf, mutation_rate=0.2, breed_ingrate=0.1, p_exp=0.7, p_new=0.1)
         self.assertEqual(winner.evaluate(["Alice Bob"]), "Alice")
 
 

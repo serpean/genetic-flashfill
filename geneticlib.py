@@ -6,11 +6,13 @@ from random import random, randint, choice
 
 logger = logging.getLogger(__name__)
 
-class Fwrapper:
+
+class FWrapper:
     def __init__(self, function, params, name):
         self.function = function
         self.params = params
         self.name = name
+
 
 class Node:
     def __init__(self, fw, children):
@@ -27,8 +29,8 @@ class Node:
         for c in self.children:
             c.display(indent + 1)
 
-    def toDict(self):
-        return {self.name: [c.toDict() for c in self.children]}
+    def to_dict(self):
+        return {self.name: [c.to_dict() for c in self.children]}
 
 
 class ParamNode:
@@ -41,7 +43,7 @@ class ParamNode:
     def display(self, indent=0):
         logger.info('%sp%d' % (' ' * indent, self.idx))
 
-    def toDict(self):
+    def to_dict(self):
         return 'p%d' % self.idx
 
 
@@ -55,22 +57,23 @@ class ConstNode:
     def display(self, indent=0):
         logger.info('%s%s' % (' ' * indent, self.v))
 
-    def toDict(self):
+    def to_dict(self):
         return self.v
 
 
-addw = Fwrapper(lambda l: l[0] + l[1], ['int', 'int'], 'add')
-subw = Fwrapper(lambda l: l[0] - l[1], ['int', 'int'], 'subtract')
-mulw = Fwrapper(lambda l: l[0] * l[1], ['int', 'int'], 'multiply')
-ifw = Fwrapper(lambda l: l[1] if l[0] > 0 else l[2], ['int', 'int', 'int'], 'if')
-gtw = Fwrapper(lambda l: 1 if l[0] > l[1] else 0, ['int', 'int'], 'isgreater')
-substringw = Fwrapper(lambda l: l[0][l[1]: l[2]], ["str", "int", "int"], 'substring')
-concatw = Fwrapper(lambda l: l[0] + l[1], ["str", "str"], 'concat')
-indexw = Fwrapper(lambda l: l[0].index(l[1]), ["str", "str"], 'index') # FIXME: String cannot contains substring. In this case, max ratio will be use
+addw = FWrapper(lambda l: l[0] + l[1], ['int', 'int'], 'add')
+subw = FWrapper(lambda l: l[0] - l[1], ['int', 'int'], 'subtract')
+mulw = FWrapper(lambda l: l[0] * l[1], ['int', 'int'], 'multiply')
+ifw = FWrapper(lambda l: l[1] if l[0] > 0 else l[2], ['int', 'int', 'int'], 'if')
+gtw = FWrapper(lambda l: 1 if l[0] > l[1] else 0, ['int', 'int'], 'isgreater')
+substringw = FWrapper(lambda l: l[0][l[1]: l[2]], ["str", "int", "int"], 'substring')
+concatw = FWrapper(lambda l: l[0] + l[1], ["str", "str"], 'concat')
+indexw = FWrapper(lambda l: l[0].index(l[1]), ["str", "str"],
+                  'index')  # FIXME: String cannot contains substring. In this case, max ratio will be use
 
-flist = {'str': [substringw, concatw, indexw], 'int': [addw, subw]}
+f_list = {'str': [substringw, concatw, indexw], 'int': [addw, subw]}
 
-reverse_fList = {
+reverse_f_list = {
     'add': addw,
     'subtract': subw,
     'multiply': mulw,
@@ -85,18 +88,18 @@ reverse_fList = {
 def recreate_function(input_value):
     if isinstance(input_value, dict):
         for k in input_value.keys():
-            return Node(reverse_fList[k], [recreate_function(v) for v in input_value[k]])
+            return Node(reverse_f_list[k], [recreate_function(v) for v in input_value[k]])
     elif isinstance(input_value, str) and 'p' in input_value:
         return ParamNode(int(input_value[input_value.index('p') + 1:]))
     else:
         return ConstNode(input_value)
 
 
-def makerandomtree(pc, datatype, maxdepth=4, fpr=0.5, ppr=0.5):
-    if random() < fpr and maxdepth > 0:
-        f = choice(flist[datatype])
+def make_random_tree(pc, datatype, max_depth=4, fpr=0.5, ppr=0.5):
+    if random() < fpr and max_depth > 0:
+        f = choice(f_list[datatype])
         # Call makerandomtree with all the parameter types for f
-        children = [makerandomtree(pc, type, maxdepth - 1, fpr, ppr) for type in f.params]
+        children = [make_random_tree(pc, type, max_depth - 1, fpr, ppr) for type in f.params]
         return Node(f, children)
     elif random() < ppr and datatype == 'str':
         return ParamNode(randint(0, pc - 1))
@@ -109,28 +112,29 @@ def makerandomtree(pc, datatype, maxdepth=4, fpr=0.5, ppr=0.5):
             return ConstNode(randint(0, 10))
 
 
-def mutate(t, pc, datatype, probchange=0.1):
-    if random() < probchange:
-        return makerandomtree(pc, datatype)
+def mutate(t, pc, datatype, prob_change=0.1):
+    if random() < prob_change:
+        return make_random_tree(pc, datatype)
     else:
         result = deepcopy(t)
         if hasattr(t, "children"):
-            result.children = [mutate(c, pc, datatype, probchange) for c in t.children]
+            result.children = [mutate(c, pc, datatype, prob_change) for c in t.children]
         return result
 
 
-def crossover(t1, t2, probswap=0.7, top=1):
-    if random() < probswap and not top:
+def crossover(t1, t2, prob_swap=0.7, top=1):
+    if random() < prob_swap and not top:
         return deepcopy(t2)
     else:
         result = deepcopy(t1)
         if hasattr(t1, 'children') and hasattr(t2, 'children'):
-            result.params = [crossover(c, choice(t2.children), probswap, 0)
-                             for c in t1.children if hasattr(t1, 'funtion') and hasattr(t2, 'funtion') and t1.funtion.params == t2.funtion.params]
+            result.params = [crossover(c, choice(t2.children), prob_swap, 0)
+                             for c in t1.children if hasattr(t1, 'funtion') and hasattr(t2,
+                                                                                        'funtion') and t1.funtion.params == t2.funtion.params]
         return result
 
 
-def scorefunction(tree, s):
+def score_function(tree, s):
     dif = 0
     for data in s:
         try:
@@ -141,9 +145,9 @@ def scorefunction(tree, s):
     return dif
 
 
-def getrankfunction(dataset):
+def get_rank_function(dataset):
     def rankfunction(population):
-        scores = [(scorefunction(t, dataset), t) for t in population]
+        scores = [(score_function(t, dataset), t) for t in population]
         # scores.sort()
         scores.sort(key=lambda tup: tup[0])
         # logger.debug(scores)
@@ -152,17 +156,17 @@ def getrankfunction(dataset):
     return rankfunction
 
 
-def evolve(pc,datatype, popsize, rankfunction, maxgen=500,
-           mutationrate=0.1, breedingrate=0.4, pexp=0.7, pnew=0.05):
+def evolve(pc, datatype, pop_size, rank_function, max_gen=500,
+           mutation_rate=0.1, breed_ingrate=0.4, p_exp=0.7, p_new=0.05):
     # Returns a random number, tending towards lower numbers. The lower pexp
     # is, more lower numbers you will get
     def selectindex():
-        return int(log(random()) / log(pexp))
+        return int(log(random()) / log(p_exp))
 
     # Create a random initial population
-    population = [makerandomtree(pc,datatype) for i in range(popsize)]
-    for i in range(maxgen):
-        scores = rankfunction(population)
+    population = [make_random_tree(pc, datatype) for i in range(pop_size)]
+    for i in range(max_gen):
+        scores = rank_function(population)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(scores[0][0])
         if scores[0][0] == 0: break
@@ -171,16 +175,16 @@ def evolve(pc,datatype, popsize, rankfunction, maxgen=500,
         newpop = [scores[0][1], scores[1][1]]
 
         # Build the next generation
-        while len(newpop) < popsize:
-            if random() > pnew:
+        while len(newpop) < pop_size:
+            if random() > p_new:
                 newpop.append(mutate(
                     crossover(scores[selectindex()][1],
                               scores[selectindex()][1],
-                              probswap=breedingrate),
-                    pc, datatype, probchange=mutationrate))
+                              prob_swap=breed_ingrate),
+                    pc, datatype, prob_change=mutation_rate))
             else:
                 # Add a random node to mix things up
-                newpop.append(makerandomtree(pc, datatype))
+                newpop.append(make_random_tree(pc, datatype))
 
         population = newpop
     if logger.isEnabledFor(logging.DEBUG):

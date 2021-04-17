@@ -1,7 +1,7 @@
 from logging.config import dictConfig
 from flask import Flask, jsonify, abort, request, redirect
 from flasgger import Swagger, swag_from
-from geneticlib import getrankfunction, evolve, recreate_function
+from geneticlib import get_rank_function, evolve, recreate_function
 from settings import LOG_CONFIG
 
 app = Flask(__name__)
@@ -19,8 +19,8 @@ def process():
         content = request.json
         app.logger.info(content)
         if content:
-            rf = getrankfunction(content["train"])
-            winner = evolve(1, 'str', 500, rf, mutationrate=0.2, breedingrate=0.1, pexp=0.7, pnew=0.1)
+            rf = get_rank_function(content["train"])
+            winner = evolve(1, 'str', 500, rf, mutation_rate=0.2, breed_ingrate=0.1, p_exp=0.7, p_new=0.1)
             return jsonify({"answer": [winner.evaluate([i]) for i in content["test"]]})
         else:
             abort(400, description="'content' is expected")
@@ -36,9 +36,9 @@ def function_generate():
         content = request.json
         app.logger.info(content)
         if content:
-            rf = getrankfunction(content["train"])
-            winner = evolve(1, 'str', 500, rf, mutationrate=0.2, breedingrate=0.1, pexp=0.7, pnew=0.1)
-            return jsonify({"function": winner.toDict()})
+            rf = get_rank_function(content["train"])
+            winner = evolve(1, 'str', 500, rf, mutation_rate=0.2, breed_ingrate=0.1, p_exp=0.7, p_new=0.1)
+            return jsonify({"function": winner.to_dict()})
         else:
             abort(400, description="'content' is expected")
 
