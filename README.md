@@ -2,7 +2,9 @@
 
 Naïve ML implementation of flashfill.
 
-This repository is used as ML backend to create Google  Spreadsheets Addon.
+This repository is used as ML backend to create Google  Spreadsheets Addon ([Video Demo](https://www.youtube.com/watch?v=PQXBgt-KzOc)).
+
+
 
 ## DEV Install
 
@@ -19,10 +21,6 @@ FLASK_APP=app.py FLASK_ENV=development flask run
 LOG_LEVEL = os.getenv("APP_LOG_LEVEL", "INFO")
 LOG_FILE_NAME_PREFIX = f"console-{datetime.today().strftime('%Y%m%d')}"
 ```
-
-## Heroku deploy
-
-> TBD
 
 ## Test server
 
